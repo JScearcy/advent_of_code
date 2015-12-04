@@ -2,6 +2,7 @@ $(function(){
   var dayOneSolution = dayOneSolution();
   var dayTwoSolution = dayTwoSolution();
   var dayThreeSolution = dayThreeSolution();
+  var dayFourSolution = dayFourSolution('iwrupvqb');
 
   function dayOneSolution(){
     var
@@ -95,5 +96,73 @@ $(function(){
         return location;
       }
   }
+  function dayFourSolution(message) {
+    if(typeof(Worker) !== "undefined") {
+      var fiveWorker = new Worker('./findFiveZeroesWorker.js');
+      var sixWorker = new Worker('./findSixZeroesWorker.js');
+    } else {
+         findFiveZeroes();
+         findSixZeroes();
+         return;
+     }
+    fiveWorker.onmessage = function(message) {
+      $("#santasHashCode").text(message.data);
+      fiveWorker.terminate();
+    };
+    sixWorker.onmessage = function(message) {
+      $("#santasHashCodeSix").text(message.data);
+      sixWorker.terminate();
+    }
 
+    function findFiveZeroes() {
+      var
+        saltFound = false,
+        salt = 0,
+        unHashedMessage = message + salt,
+        hashedMessage = '';
+      while(!saltFound) {
+        hashedMessage = hashAMessage(unHashedMessage);
+        saltFound = checkHashForSomeZeroes(hashedMessage, 5);
+        if(!saltFound) {
+          salt++;
+          unHashedMessage = message + salt;
+        }
+      }
+      return $("#santasHashCode").text("Santa's secret AdventCoin salt was " + salt + " for five zeroes");
+    }
+
+    function findSixZeroes() {
+      var
+        saltFound = false,
+        salt = 0,
+        unHashedMessage = message + salt,
+        hashedMessage = '';
+      while(!saltFound) {
+        hashedMessage = hashAMessage(unHashedMessage);
+        saltFound = checkHashForSomeZeroes(hashedMessage, 6);
+        if(!saltFound) {
+          salt++;
+          unHashedMessage = message + salt;
+        }
+      }
+      return $("#santasHashCodeSix").text("Santa's secret AdventCoin salt was " + salt + " for six zeroes");
+    }
+
+    function checkHashForSomeZeroes(localHashedMessage, checkForThisManyZeroes) {
+      var zeroCount = 0;
+      localHashedMessage = localHashedMessage.split('');
+      for(var i = 0; i < checkForThisManyZeroes; i++) {
+        if(localHashedMessage[i] == 0) {
+          zeroCount++
+        }
+      }
+      return zeroCount >= checkForThisManyZeroes;
+    }
+
+    function hashAMessage(hashMessage) {
+      return CryptoJS.MD5(hashMessage).toString();
+    }
+
+
+  }
 });
