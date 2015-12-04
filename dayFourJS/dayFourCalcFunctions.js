@@ -9,7 +9,7 @@ function findZeroes(message, howManyZeroes) {
       saltFinderVars.unHashedMessage = message + saltFinderVars.salt;
     }
   }
-  return "Santa's AdventCoin salt was " + saltFinderVars.salt + " for six zeroes";
+  return "Santa's AdventCoin salt was " + saltFinderVars.salt + " for " + howManyZeroes + " zeroes";
 }
 
 function saltFinderCtor(message) {
