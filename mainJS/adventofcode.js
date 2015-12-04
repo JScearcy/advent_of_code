@@ -96,13 +96,13 @@ $(function(){
         return location;
       }
   }
-  function dayFourSolution(message) {
+  function dayFourSolution(startMessage) {
     if(typeof(Worker) !== "undefined") {
-      var fiveWorker = new Worker('./findFiveZeroesWorker.js');
-      var sixWorker = new Worker('./findSixZeroesWorker.js');
+      var fiveWorker = new Worker('./dayFourJS/findFiveZeroesWorker.js');
+      var sixWorker = new Worker('../dayFourJS/findSixZeroesWorker.js');
     } else {
-         findFiveZeroes();
-         findSixZeroes();
+         $("#santasHashCode").text(findZeroes(startMessage, 5));
+         $("#santasHashCodeSix").text(findZeroes(startMessage, 6));
          return;
      }
     fiveWorker.onmessage = function(message) {
@@ -113,56 +113,5 @@ $(function(){
       $("#santasHashCodeSix").text(message.data);
       sixWorker.terminate();
     }
-
-    function findFiveZeroes() {
-      var
-        saltFound = false,
-        salt = 0,
-        unHashedMessage = message + salt,
-        hashedMessage = '';
-      while(!saltFound) {
-        hashedMessage = hashAMessage(unHashedMessage);
-        saltFound = checkHashForSomeZeroes(hashedMessage, 5);
-        if(!saltFound) {
-          salt++;
-          unHashedMessage = message + salt;
-        }
-      }
-      return $("#santasHashCode").text("Santa's secret AdventCoin salt was " + salt + " for five zeroes");
-    }
-
-    function findSixZeroes() {
-      var
-        saltFound = false,
-        salt = 0,
-        unHashedMessage = message + salt,
-        hashedMessage = '';
-      while(!saltFound) {
-        hashedMessage = hashAMessage(unHashedMessage);
-        saltFound = checkHashForSomeZeroes(hashedMessage, 6);
-        if(!saltFound) {
-          salt++;
-          unHashedMessage = message + salt;
-        }
-      }
-      return $("#santasHashCodeSix").text("Santa's secret AdventCoin salt was " + salt + " for six zeroes");
-    }
-
-    function checkHashForSomeZeroes(localHashedMessage, checkForThisManyZeroes) {
-      var zeroCount = 0;
-      localHashedMessage = localHashedMessage.split('');
-      for(var i = 0; i < checkForThisManyZeroes; i++) {
-        if(localHashedMessage[i] == 0) {
-          zeroCount++
-        }
-      }
-      return zeroCount >= checkForThisManyZeroes;
-    }
-
-    function hashAMessage(hashMessage) {
-      return CryptoJS.MD5(hashMessage).toString();
-    }
-
-
   }
 });
